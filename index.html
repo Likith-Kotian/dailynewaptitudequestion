@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aptilavate Interactive Question</title>
+    <style>
+        /* Notion-style clean UI */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+            color: #37352f;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 12px 16px;
+            font-size: 15px;
+            background: #f7f7f5;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .option:hover:not(:disabled) {
+            background: #efefed;
+        }
+        .option:disabled {
+            cursor: default;
+        }
+        /* Color states for answers */
+        .option.correct {
+            background-color: #e6f4ea;
+            border-color: #1e8e3e;
+            color: #137333;
+            font-weight: 600;
+        }
+        .option.wrong {
+            background-color: #fce8e6;
+            border-color: #d93025;
+            color: #a50e0e;
+        }
+        /* Solution and Navigation */
+        .solution-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e1e1e1;
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.4s ease-in;
+        }
+        .solution-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+            background: #f7f6f3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .nav-btn {
+            background-color: #2383e2;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .nav-btn:hover {
+            background-color: #1a6ab8;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MAIN QUESTION VIEW -->
+    <div id="view-main" class="container">
+        <div class="question-text">
+            Q1. In how many different ways can the letters of the word "ORANGE" be arranged so that the vowels never come together?
+        </div>
+        <div class="options" id="options-main">
+            <button class="option" onclick="handleAnswer('main', this, false, 2)">1. 144</button>
+            <button class="option" onclick="handleAnswer('main', this, false, 2)">2. 240</button>
+            <button class="option" onclick="handleAnswer('main', this, true, 2)">3. 576</button>
+            <button class="option" onclick="handleAnswer('main', this, false, 2)">4. 720</button>
+        </div>
+        
+        <div id="solution-main" class="solution-section">
+            <div class="solution-text">
+                <strong>Solution:</strong><br>
+                1. Total arrangements of 6 letters = 6! = 720.<br>
+                2. Vowels (O, A, E) together: Treat as 1 unit + 3 consonants (R, N, G) = 4 units. Arrangements = 4! × 3! = 144.<br>
+                3. Vowels never together = Total - Together = 720 - 144 = <strong>576</strong>.
+            </div>
+            <button class="nav-btn" onclick="switchView('view-main', 'view-similar')">Solve Similar Question ➔</button>
+        </div>
+    </div>
+
+    <!-- SIMILAR QUESTION VIEW -->
+    <div id="view-similar" class="container hidden">
+        <div class="question-text">
+            Q2. In how many different ways can the letters of the word "DESIGN" be arranged such that the vowels never come together?
+        </div>
+        <div class="options" id="options-similar">
+            <button class="option" onclick="handleAnswer('similar', this, false, 1)">1. 240</button>
+            <button class="option" onclick="handleAnswer('similar', this, true, 1)">2. 480</button>
+            <button class="option" onclick="handleAnswer('similar', this, false, 1)">3. 504</button>
+            <button class="option" onclick="handleAnswer('similar', this, false, 1)">4. 600</button>
+        </div>
+        
+        <div id="solution-similar" class="solution-section">
+            <div class="solution-text">
+                <strong>Solution:</strong><br>
+                1. Total arrangements of 6 letters = 6! = 720.<br>
+                2. Vowels (E, I) together: Treat as 1 unit + 4 consonants (D, S, G, N) = 5 units. Arrangements = 5! × 2! = 120 × 2 = 240.<br>
+                3. Vowels never together = 720 - 240 = <strong>480</strong>.
+            </div>
+            <button class="nav-btn" style="background-color: #555;" onclick="switchView('view-similar', 'view-main')">⬅ Back to Original Question</button>
+        </div>
+    </div>
+
+    <script>
+        function handleAnswer(viewId, selectedBtn, isCorrect, correctIndex) {
+            const optionsContainer = document.getElementById(`options-${viewId}`);
+            const buttons = optionsContainer.getElementsByClassName('option');
+            const solution = document.getElementById(`solution-${viewId}`);
+
+            // Disable all buttons so user can't click multiple times
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            // Apply color to the clicked button
+            if (isCorrect) {
+                selectedBtn.classList.add('correct');
+            } else {
+                selectedBtn.classList.add('wrong');
+                // Automatically highlight the correct answer in green
+                buttons[correctIndex].classList.add('correct');
+            }
+
+            // Reveal the solution and next button
+            solution.style.display = 'block';
+        }
+
+        function switchView(hideId, showId) {
+            document.getElementById(hideId).classList.add('hidden');
+            document.getElementById(showId).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
